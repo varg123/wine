@@ -22,7 +22,7 @@ def get_wine_record():
         reader = csv.DictReader(wine_file, delimiter=';')
         for record in reader:
             discount = False
-            if record['Выгодное предложение'].strip().lower() == 'Да':
+            if record['Выгодное предложение'].strip().lower() == 'да':
                 discount = True
             yield Wine_Record(
                 record['Название'],
@@ -35,6 +35,7 @@ def get_wine_record():
 
 
 wines = list(get_wine_record())
+print(wines)
 rendered_page = template.render(
     age=age,
     wines=wines
