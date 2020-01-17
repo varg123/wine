@@ -3,6 +3,7 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 import datetime
 import csv
 from collections import namedtuple
+import pendulum
 
 env = Environment(
     loader=FileSystemLoader('.'),
@@ -11,10 +12,11 @@ env = Environment(
 
 template = env.get_template('template.html')
 
-year_of_creation = datetime.datetime(year=1920, month=1, day=1)
-age = datetime.datetime.now() - year_of_creation
-
+year_of_creation = pendulum.datetime(1920, 1, 1)
+age = (pendulum.now() - year_of_creation).years
 Wine_Record = namedtuple('Wine_Record', 'name type price image_src category discount')
+
+
 def get_wine_record():
     with open('wine.csv', 'r', encoding="utf8") as wine_file:
         reader = csv.DictReader(wine_file, delimiter=';')
@@ -22,7 +24,7 @@ def get_wine_record():
             discount = False
             if record['Выгодное предложение'].strip().lower() == 'Да':
                 discount = True
-            yield  Wine_Record(
+            yield Wine_Record(
                 record['Название'],
                 record['Сорт'],
                 record['Цена'],
@@ -34,12 +36,12 @@ def get_wine_record():
 
 wines = list(get_wine_record())
 rendered_page = template.render(
-    age=int(age.days / 365.25),
+    age=age,
     wines=wines
 )
 
-with open('index.html', 'w', encoding="utf8") as file:
-    file.write(rendered_page)
+with open('index.html', 'w', encoding="utf8") as index_file:
+    index_file.write(rendered_page)
 
 server = HTTPServer(('0.0.0.0', 8000), SimpleHTTPRequestHandler)
 server.serve_forever()
