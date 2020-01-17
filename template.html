@@ -121,7 +121,9 @@
               <div>
                 <h3 class="heading mt-3 mb-3 text-dark">{{ wine.name }}</h3>
                 <p>
-                  {{ wine.type }}<br/>
+                  {% if wine.type %}
+                    {{ wine.type }}<br/>
+                  {% endif %}
                   <span class="price">{{ wine.price }} р.</span>
                 </p>
               </div>
