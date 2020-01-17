@@ -1,7 +1,7 @@
 from http.server import HTTPServer, SimpleHTTPRequestHandler
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 import datetime
-
+import csv
 from collections import namedtuple
 
 env = Environment(
@@ -14,19 +14,25 @@ template = env.get_template('template.html')
 year_of_creation = datetime.datetime(year=1920, month=1, day=1)
 age = datetime.datetime.now() - year_of_creation
 
+Wine_Record = namedtuple('Wine_Record', 'name type price image_src category discount')
+def get_wine_record():
+    with open('wine.csv', 'r', encoding="utf8") as wine_file:
+        reader = csv.DictReader(wine_file, delimiter=';')
+        for record in reader:
+            discount = False
+            if record['Выгодное предложение'].strip().lower() == 'Да':
+                discount = True
+            yield  Wine_Record(
+                record['Название'],
+                record['Сорт'],
+                record['Цена'],
+                record['Картинка'],
+                record['Категория'],
+                discount,
+            )
 
-#TODO: сделать нормальные названия
-Parts = namedtuple('Parts', 'name type price image_src')
-with open('wine.txt', 'r', encoding="utf8") as file:
-    wines_info = file.read().replace('\ufeff', '').split('\n\n')
-wines = []
-for wine_info in wines_info:
-    list1 = []
-    for item in wine_info.split('\n'):
-        list1.append(item.split(': ')[1])
-    wines.append(Parts(*list1))
 
-
+wines = list(get_wine_record())
 rendered_page = template.render(
     age=int(age.days / 365.25),
     wines=wines
