@@ -3,6 +3,11 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 import csv
 from collections import namedtuple
 import pendulum
+import argparse
+
+parser = argparse.ArgumentParser()
+parser.add_argument('--wine_file', help='File with information about wines', default='wine.csv')
+args = parser.parse_args()
 
 env = Environment(
     loader=FileSystemLoader('.'),
@@ -17,7 +22,7 @@ Wine_Record = namedtuple('Wine_Record', 'name type price image_src category disc
 
 
 def get_wine_record():
-    with open('wine.csv', 'r', encoding="utf8") as wine_file:
+    with open(args.wine_file, 'r', encoding="utf8") as wine_file:
         reader = csv.DictReader(wine_file, delimiter=';')
         for record in reader:
             discount = False
@@ -33,7 +38,11 @@ def get_wine_record():
             )
 
 
-wines = list(get_wine_record())
+try:
+    wines = list(get_wine_record())
+except FileNotFoundError:
+    exit('Ошибка: Ненайден файл с информацией об винах')
+
 rendered_page = template.render(
     age=age,
     wines=wines
