@@ -25,9 +25,7 @@ def get_wine_record():
     with open(args.wine_file, 'r', encoding="utf8") as wine_file:
         reader = csv.DictReader(wine_file, delimiter=';')
         for record in reader:
-            discount = False
-            if record['Выгодное предложение'].strip().lower() == 'да':
-                discount = True
+            discount = record['Выгодное предложение'].strip().lower() == 'да'
             yield Wine_Record(
                 record['Название'],
                 record['Сорт'],
