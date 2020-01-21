@@ -34,7 +34,6 @@ def get_wine_record():
 
 
 wines = list(get_wine_record())
-print(wines)
 rendered_page = template.render(
     age=age,
     wines=wines
